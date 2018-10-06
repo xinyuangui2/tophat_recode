@@ -1,3 +1,0 @@
-/media/xinyuangui/Data/clionProject/tophat_recode_reorganize/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/media/xinyuangui/Data/clionProject/tophat_recode_reorganize/cmake-build-debug/CMakeFiles/edit_cache.dir
-/media/xinyuangui/Data/clionProject/tophat_recode_reorganize/cmake-build-debug/CMakeFiles/tophat_recode_reorganize.dir

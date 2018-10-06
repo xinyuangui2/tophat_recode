@@ -1,4 +1,0 @@
-/media/xinyuangui/Data/clion-2018.2.2/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /media/xinyuangui/Data/clionProject/tophat_recode_reorganize
--- Configuring done
--- Generating done
--- Build files have been written to: /media/xinyuangui/Data/clionProject/tophat_recode_reorganize/cmake-build-debug
