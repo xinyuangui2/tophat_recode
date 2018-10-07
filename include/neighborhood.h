@@ -75,8 +75,6 @@ typedef struct NeighborhoodWalker_tag {
 } *NeighborhoodWalker_T;
 
 Neighborhood_T nhMakeNeighborhood(int D, int center_location);
-template <typename _T>
-Neighborhood_T nhMakeNeighborhood(_T *D, int*size, int center_location);
 NeighborhoodWalker_T nhMakeNeighborhoodWalker(Neighborhood_T nhood, const int *input_size, unsigned int flags);
 Neighborhood_T nhMakeDefaultConnectivityNeighborhood();
 void nhReflectNeighborhood(Neighborhood_T nhood);
@@ -94,10 +92,25 @@ void ind_to_sub(int p, int *cumprod, int *coords);
 void ind_to_sub(int p, int *cumprod, ptrdiff_t *coords);
 
 ptrdiff_t *nhGetWalkerNeighborOffsets(NeighborhoodWalker_T walker);
-template <typename _T>
-int num_nonzeros(_T *D, int *size);
 Neighborhood_T allocate_neighborhood(int num_neighbors);
 int ngGetNumNeighbors(NeighborhoodWalker_T walker);
+
+/**
+ * count nonzero elements of real part of 2-d array
+ * @tparam _T
+ * @param D
+ * @param size
+ * @return
+ */
+template <typename _T>
+int num_nonzeros(_T *D, int *size) {
+    int num_elements = size[0] * size[1];
+    int count = 0;
+    for (int i = 0; i < num_elements; ++i) {
+        if (D[i]) ++count;
+    }
+    return count;
+}
 
 /**
  *

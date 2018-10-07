@@ -98,13 +98,14 @@ void erodeGrayFlat(_t *In, _t *Out, int num_elements,
         _t val;
         _t new_val;
 
-        setMax(&val);
+        bool val_set = false;
         nhSetWalkerLocation(walker, p);
         while (nhGetNextInboundsNeighbor(walker, &q, NULL))
         {
             new_val = In[q];
-            if (new_val < val)
+            if (!val_set || new_val < val)
             {
+                val_set = true;
                 val = new_val;
             }
         }

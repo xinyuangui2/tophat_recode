@@ -64,11 +64,6 @@ Neighborhood_T nhMakeNeighborhood(int D, int center_location) {
     return result;
 }
 
-template <typename _T>
-Neighborhood_T nhMakeNeighborhood(_T *D, int*size, int center_location) {
-    return create_neighborhood_general_template(D, size, center_location);
-}
-
 /**
  * allocate_neighborhood_walker
  * Allocate space for NeighborhoodWalker_T object.
@@ -496,7 +491,6 @@ bool nhGetNextInboundsNeighbor(NeighborhoodWalker_T walker, int *p, int *idx) {
     if (p == NULL) {
         throw std::invalid_argument("p cannot be NULL");
     }
-
     for (int k = walker->next_neighbor_idx; k < walker->num_neighbors; ++k) {
         if (walker->use[k] &&
         is_inbounds_neighbor(walker->array_coords + k * NUM_DIMS, walker->center_coords, walker->image_size)) {
@@ -543,23 +537,6 @@ ptrdiff_t *nhGetWalkerNeighborOffsets(NeighborhoodWalker_T walker)
 }
 
 /**
- * count nonzero elements of real part of 2-d array
- * @tparam _T
- * @param D
- * @param size
- * @return
- */
-template <typename _T>
-int num_nonzeros(_T *D, int *size) {
-    int num_elements = size[0] * size[1];
-    int count = 0;
-    for (int i = 0; i < num_elements; ++i) {
-        if (D[i]) ++count;
-    }
-    return count;
-}
-
-/**
  * allocate space for new neighborhood object
  * @param num
  * @return
@@ -603,8 +580,11 @@ ptrdiff_t sub_to_ind_signed(ptrdiff_t *coords, int *cumprod) {
  * @param coords
  */
 void ind_to_sub(int p, int *cumprod, int *coords) {
-    coords[1] = p / cumprod[0];
-    coords[0] = p % cumprod[0];
+    for (int j_up = 0; j_up < NUM_DIMS; ++j_up) {
+        int j = NUM_DIMS - 1 - j_up;
+        coords[j] = p / cumprod[j];
+        p = p % cumprod[j];
+    }
 }
 
 void ind_to_sub(int p, int *cumprod, ptrdiff_t *coords) {
