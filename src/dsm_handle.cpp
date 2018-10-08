@@ -29,7 +29,7 @@ dsm_handle::dsm_handle(const char *file_name) {
     paf_scan_line = (float *)CPLMalloc(sizeof(float) * x_size);
     int index = 0;
     for (int i = 0; i < y_size; ++i) {
-        po_band->RasterIO( GF_Read, 0, 0, x_size, 1,
+        po_band->RasterIO( GF_Read, 0, i, x_size, 1,
                           paf_scan_line, x_size, 1, GDT_Float32,
                           0, 0 );
         for (int j = 0; j < x_size; ++j) {
