@@ -2,6 +2,7 @@
  * This file is used to test the algorithms
  */
 #include <iostream>
+#include <fstream>
 #include "dsm_handle.h"
 #include "reconstruct.h"
 #include "morph.h"
@@ -81,6 +82,22 @@ void print_data(float *data, int y_input, int x_input) {
     }
 }
 
+void write_data_to_txt(float* data, int y_input, int x_input, std::string file_name) {
+    std::ofstream myfile;
+    myfile.open (file_name);
+    int index = 0;
+    for (int i = 0; i < y_input; ++i) {
+        for (int j = 0; j < x_input; ++j) {
+            if (j != 0) myfile << " ";
+            myfile << data[index++];
+        }
+        if (i != y_input - 1) {
+            myfile << std::endl;
+        }
+    }
+    myfile.close();
+}
+
 int main() {
     dsm_handle handler("dsm.tif");
     float *data = handler.get_dsm_data();
@@ -93,14 +110,20 @@ int main() {
 
     float *reconstruct_result = im_reconstruct(imer, data, handler.get_y_size(), handler.get_x_size());
 
-    float max = 0;
+    float min = 1111;
+    float max = -1111111;
     for (int i = 0; i < y_inputs; ++i) {
         for (int j = 0; j < x_inputs; ++j) {
-            imer[i * x_inputs + j] = data[i * x_inputs + j] - imer[i * x_inputs + j];
-            max = imer[i * x_inputs + j] > max ? imer[i * x_inputs + j] : max;
+            reconstruct_result[i * x_inputs + j] = reconstruct_result[i * x_inputs + j] - data[i * x_inputs + j];
+            max = reconstruct_result[i * x_inputs + j] > max ? reconstruct_result[i * x_inputs + j] : max;
+            min = reconstruct_result[i * x_inputs + j] < min ? reconstruct_result[i * x_inputs + j] : min;
         }
     }
-    std::cout << max << std::endl;
+//    std::cout << max << ", " << min << std::endl;
+
+    handler.write_data_to_file("reconstruct.tif", reconstruct_result, y_inputs, x_inputs);
+//    handler.write_data_to_file("erode.tif", imer, y_inputs, x_inputs);
+
     free(imer);
     free(reconstruct_result);
 }

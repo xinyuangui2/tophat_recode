@@ -14,6 +14,7 @@ public:
     float* get_dsm_data();
     int get_y_size();
     int get_x_size();
+    void write_data_to_file(const char* file, float *data, int y_input, int x_input);
     ~dsm_handle();
 private:
     GDALDataset *po_dataset;

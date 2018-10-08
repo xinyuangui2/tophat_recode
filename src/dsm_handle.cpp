@@ -57,3 +57,17 @@ dsm_handle::~dsm_handle() {
         free(data);
     }
 }
+
+void dsm_handle::write_data_to_file(const char* file, float *data, int y_input, int x_input) {
+    GDALDriver *pDriverTiff = GetGDALDriverManager()->GetDriverByName("GTiff");
+    GDALDataset *pNewDS = pDriverTiff->Create(file, x_input, y_input, 1, GDT_Float32, NULL);
+
+    for (int i = 0; i < y_input; ++i) {
+        pNewDS->GetRasterBand(1)->RasterIO(GF_Write, 0, i, x_input, 1, data, x_input,
+                1, GDT_Float32, 0, 0);
+    }
+
+    GDALClose(pNewDS);
+
+    GDALDestroyDriverManager();
+}
