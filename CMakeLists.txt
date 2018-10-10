@@ -3,7 +3,7 @@ project(tophat_recode_reorganize)
 
 set(CMAKE_CXX_STANDARD 14)
 
-set(SOURCES test.cpp src/dilate_erode_binary.cpp src/dilate_erode_gray_nonflat.cpp src/dilate_erode_packed.cpp src/morph.cpp src/neighborhood.cpp src/dsm_handle.cpp include/top_hat_extract.h)
+set(SOURCES test.cpp src/dilate_erode_binary.cpp src/dilate_erode_gray_nonflat.cpp src/dilate_erode_packed.cpp src/morph.cpp src/neighborhood.cpp dsm_handle.cpp)
 
 set(GDAL_DIR /Library/Frameworks/GDAL.framework/unix)
 
