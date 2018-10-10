@@ -1,13 +1,13 @@
-/**
- * This file is used to test the algorithms
- */
-#include <iostream>
-#include <fstream>
-#include "dsm_handle.h"
+//
+// Created by Xinyuan Gui on 10/9/18.
+//
+
+#ifndef TOPHAT_RECODE_REORGANIZE_TOP_HAT_EXTRACT_H
+#define TOPHAT_RECODE_REORGANIZE_TOP_HAT_EXTRACT_H
+
+
 #include "reconstruct.h"
 #include "morph.h"
-
-
 /**
  * duplicate the float pointer, should clear later
  * @param data
@@ -19,6 +19,7 @@ float* duplicate(float *data, int y_input, int x_input) {
     float *result = (float *)malloc(sizeof(float) * y_input * x_input);
     return (float*)memcpy(result, data, sizeof(float) * y_input * x_input);
 }
+
 
 float* im_reconstruct(float *imer, float *img, int y_input, int x_input) {
     Neighborhood_T nhood;
@@ -72,71 +73,31 @@ float* im_erode(float *img, int y_input, int x_input, int *mask, int mask_y, int
     return out_img;
 }
 
-void print_data(float *data, int y_input, int x_input) {
-    int index = 0;
+/**
+ * return the tophat result
+ * @param origin_img
+ * @param y_input rows of the image
+ * @param x_input cols of the image
+ * @param mask mask for the erode neighbor
+ * @param mask_y rows of the mask
+ * @param mask_x cols of the mask
+ * @return tophat_result
+ */
+float* top_hat_extract(float *origin_img, int y_input, int x_input,
+        int *mask, int mask_y, int mask_x) {
+    float *imer = im_erode(origin_img, y_input, x_input, mask, mask_y, mask_y);
+
+    float *reconstruct_result = im_reconstruct(imer, origin_img, y_input, x_input);
+
     for (int i = 0; i < y_input; ++i) {
         for (int j = 0; j < x_input; ++j) {
-            std::cout << data[index++] << ", ";
-        }
-        std::cout << std::endl;
-    }
-}
-
-void write_data_to_txt(float* data, int y_input, int x_input, std::string file_name) {
-    std::ofstream myfile;
-    myfile.open (file_name);
-    int index = 0;
-    for (int i = 0; i < y_input; ++i) {
-        for (int j = 0; j < x_input; ++j) {
-            if (j != 0) myfile << " ";
-            myfile << data[i * x_input + j];
-        }
-        if (i != y_input - 1) {
-            myfile << std::endl;
+            reconstruct_result[i * x_input + j] = origin_img[i * x_input + j] - reconstruct_result[i * x_input + j];
         }
     }
-    myfile.close();
-}
 
-int main() {
-    dsm_handle handler("dsm.tif");
-    float *data = handler.get_dsm_data();
-
-
-//    handler.write_data_to_file("new_data.tif", data, handler.get_y_size(), handler.get_x_size());
-
-    int num_elements = handler.get_x_size() * handler.get_y_size();
-    int y_inputs = handler.get_y_size();
-    int x_inputs = handler.get_x_size();
-
-    int mask[225];
-    for (int i = 0; i < 225; ++i) mask[i] = 1;
-
-    float *imer = im_erode(data, y_inputs, x_inputs, mask, 15, 15);
-
-    float *reconstruct_result = im_reconstruct(imer, data, handler.get_y_size(), handler.get_x_size());
-
-    float min = 1111;
-    float max = -1111111;
-    for (int i = 0; i < y_inputs; ++i) {
-        for (int j = 0; j < x_inputs; ++j) {
-            reconstruct_result[i * x_inputs + j] = data[i * x_inputs + j] - reconstruct_result[i * x_inputs + j];
-            max = reconstruct_result[i * x_inputs + j] > max ? reconstruct_result[i * x_inputs + j] : max;
-            min = reconstruct_result[i * x_inputs + j] < min ? reconstruct_result[i * x_inputs + j] : min;
-        }
-    }
-    std::cout << max << ", " << min << std::endl;
-
-
-
-//    print_data(imer, y_inputs, x_inputs);
-
-    write_data_to_txt(data, y_inputs, x_inputs, "new_data.txt");
-    write_data_to_txt(imer, y_inputs, x_inputs, "imer.txt");
-    write_data_to_txt(reconstruct_result, y_inputs, x_inputs, "reconstruct.txt");
-//    handler.write_data_to_file("new_data.tif", data, y_inputs, x_inputs);
-//    handler.write_data_to_file("erode1.tif", reconstruct_result, y_inputs, x_inputs);
-//
     free(imer);
-    free(reconstruct_result);
+
+    return reconstruct_result;
 }
+
+#endif //TOPHAT_RECODE_REORGANIZE_TOP_HAT_EXTRACT_H
