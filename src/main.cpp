@@ -51,11 +51,11 @@ float* im_reconstruct(float *imer, float *img, int y_input, int x_input) {
     return J;
 }
 
-float* im_erode(float *img, int y_input, int x_input, float *mask, int mask_y, int mask_x) {
+float* im_erode(float *img, int y_input, int x_input, int *mask, int mask_y, int mask_x) {
     Neighborhood_T nhood;
     if (mask) {
         int mask_size[2] = {mask_x, mask_y};
-        nhood = create_neighborhood_general_template(mask, mask_size, NH_CENTER_UL);
+        nhood = create_neighborhood_general_template(mask, mask_size, NH_CENTER_MIDDLE_ROUNDDOWN);
     } else {
         nhood = nhMakeDefaultConnectivityNeighborhood();
     }
@@ -89,7 +89,7 @@ void write_data_to_txt(float* data, int y_input, int x_input, std::string file_n
     for (int i = 0; i < y_input; ++i) {
         for (int j = 0; j < x_input; ++j) {
             if (j != 0) myfile << " ";
-            myfile << data[index++];
+            myfile << data[i * x_input + j];
         }
         if (i != y_input - 1) {
             myfile << std::endl;
@@ -102,11 +102,17 @@ int main() {
     dsm_handle handler("dsm.tif");
     float *data = handler.get_dsm_data();
 
+
+//    handler.write_data_to_file("new_data.tif", data, handler.get_y_size(), handler.get_x_size());
+
     int num_elements = handler.get_x_size() * handler.get_y_size();
     int y_inputs = handler.get_y_size();
     int x_inputs = handler.get_x_size();
 
-    float *imer = im_erode(data, y_inputs, x_inputs, NULL, 0, 0);
+    int mask[225];
+    for (int i = 0; i < 225; ++i) mask[i] = 1;
+
+    float *imer = im_erode(data, y_inputs, x_inputs, mask, 15, 15);
 
     float *reconstruct_result = im_reconstruct(imer, data, handler.get_y_size(), handler.get_x_size());
 
@@ -114,16 +120,23 @@ int main() {
     float max = -1111111;
     for (int i = 0; i < y_inputs; ++i) {
         for (int j = 0; j < x_inputs; ++j) {
-            reconstruct_result[i * x_inputs + j] = reconstruct_result[i * x_inputs + j] - data[i * x_inputs + j];
+            reconstruct_result[i * x_inputs + j] = data[i * x_inputs + j] - reconstruct_result[i * x_inputs + j];
             max = reconstruct_result[i * x_inputs + j] > max ? reconstruct_result[i * x_inputs + j] : max;
             min = reconstruct_result[i * x_inputs + j] < min ? reconstruct_result[i * x_inputs + j] : min;
         }
     }
-//    std::cout << max << ", " << min << std::endl;
+    std::cout << max << ", " << min << std::endl;
 
-    handler.write_data_to_file("reconstruct.tif", reconstruct_result, y_inputs, x_inputs);
-//    handler.write_data_to_file("erode.tif", imer, y_inputs, x_inputs);
 
+
+//    print_data(imer, y_inputs, x_inputs);
+
+    write_data_to_txt(data, y_inputs, x_inputs, "new_data.txt");
+    write_data_to_txt(imer, y_inputs, x_inputs, "imer.txt");
+    write_data_to_txt(reconstruct_result, y_inputs, x_inputs, "reconstruct.txt");
+//    handler.write_data_to_file("new_data.tif", data, y_inputs, x_inputs);
+//    handler.write_data_to_file("erode1.tif", reconstruct_result, y_inputs, x_inputs);
+//
     free(imer);
     free(reconstruct_result);
 }

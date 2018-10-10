@@ -8,6 +8,7 @@
 
 #include <cstddef>
 #include <cstdlib>
+#include <iostream>
 
 #define NH_USE_ALL       0
 #define NH_SKIP_TRAILING 1
@@ -167,6 +168,7 @@ Neighborhood_T create_neighborhood_general_template(_T1 *pr, int* size, int cent
         ++pr;
     }
     free(cumprod);
+
     return result;
 }
 

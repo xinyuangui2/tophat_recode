@@ -588,8 +588,12 @@ void ind_to_sub(int p, int *cumprod, int *coords) {
 }
 
 void ind_to_sub(int p, int *cumprod, ptrdiff_t *coords) {
-    coords[1] = static_cast<ptrdiff_t>(p / cumprod[0]);
-    coords[0] = static_cast<ptrdiff_t >(p % cumprod[0]);
+    for (int j_up = 0; j_up < NUM_DIMS; ++j_up) {
+        int j = NUM_DIMS - 1 - j_up;
+
+        coords[j] = p / cumprod[j];
+        p = p % cumprod[j];
+    }
 }
 
 
